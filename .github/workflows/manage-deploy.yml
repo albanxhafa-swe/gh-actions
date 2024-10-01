@@ -1,0 +1,77 @@
+name: Branch Management and Deployment
+
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    types: [closed]
+    branches:
+      - development
+      - staging
+      - main
+
+jobs:
+  deploy-development:
+    if: github.ref == 'refs/heads/development'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Development
+        run: |
+          # Add your deployment steps for the development environment
+          # This could include building your Next.js app and deploying to Google Cloud
+
+  create-staging-pr:
+    needs: deploy-development
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Pull Request to Staging
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: staging
+          base: staging
+          title: Merge development into staging
+          body: |
+            This PR was automatically created to merge changes from development into staging.
+            Please review and merge if appropriate.
+
+  deploy-staging:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to Staging
+        run: |
+          # Add your deployment steps for the staging environment
+          # This could include building your Next.js app and deploying to Google Cloud
+
+  create-main-pr:
+    needs: deploy-staging
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Pull Request to main
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          base: main
+          title: Merge staging into main
+          body: |
+            This PR was automatically created to merge changes from staging into main.
+            Please review and merge if appropriate.
+
+  deploy-main:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to main
+        run: |
+          # Add your deployment steps for the main environment
+          # This could include building your Next.js app and deploying to Google Cloud
