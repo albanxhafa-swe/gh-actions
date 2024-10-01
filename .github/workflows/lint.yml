@@ -13,16 +13,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc" # This will use the Node.js version specified in your .nvmrc file
-
-      - name: Debug info
-        run: |
-          echo "Node version:"
-          node --version
-          echo "NPM version:"
-          npm --version
-          echo "Package.json content:"
-          cat package.json
+          node-version-file: ".nvmrc"
 
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -33,10 +24,7 @@ jobs:
             ${{ runner.OS }}-node-
 
       - name: Install dependencies
-        run: |
-          npm ci
-        env:
-          CI: true
+        run: npm ci
 
       - name: Run linting
         run: npm run lint
