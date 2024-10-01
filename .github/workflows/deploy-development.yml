@@ -1,0 +1,14 @@
+name: Deploy to Development
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Development
+        run: |
+          # Add your deployment steps for the development environment
+          # This could include building your Next.js app and deploying to Google Cloud
