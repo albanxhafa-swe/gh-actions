@@ -1,4 +1,4 @@
-name: Deploy to Production
+name: Deploy to Main
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy to Production
+      - name: Deploy to Main
         run: |
-          # Add your deployment steps for the production environment
+          # Add your deployment steps for the main environment
           # This could include building your Next.js app and deploying to Google Cloud

@@ -5,7 +5,7 @@ on:
     branches: [development]
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches: [development, staging, production]
+    branches: [development, staging, main]
 
 jobs:
   lint:
@@ -28,14 +28,14 @@ jobs:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
     uses: ./.github/workflows/deploy-staging.yml
 
-  create-production-pr:
+  create-main-pr:
     needs: staging
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
     uses: ./.github/workflows/create-pr.yml
     with:
-      base: production
+      base: main
       head: staging
 
-  production:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'production'
-    uses: ./.github/workflows/deploy-production.yml
+  main:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/deploy-main.yml
