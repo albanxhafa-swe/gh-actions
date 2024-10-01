@@ -12,11 +12,11 @@ on:
       title:
         required: false
         type: string
-        default: "Merge {head} into {base}"
+        default: "Merge {0} into {1}"
       body:
         required: false
         type: string
-        default: "This PR was automatically created to merge changes from {head} into {base}."
+        default: "This PR was automatically created to merge changes from {0} into {1}."
 
 jobs:
   create-pr:
@@ -29,7 +29,12 @@ jobs:
 
       - name: Get latest commit message
         id: get-commit-message
-        run: echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+        run: |
+          MESSAGE=$(git log -1 --pretty=%B)
+          MESSAGE="${MESSAGE//'%'/'%25'}"
+          MESSAGE="${MESSAGE//$'\n'/'%0A'}"
+          MESSAGE="${MESSAGE//$'\r'/'%0D'}"
+          echo "message=$MESSAGE" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         id: cpr
@@ -58,5 +63,4 @@ jobs:
 
       - name: Print error
         if: failure() && steps.cpr.outputs.error-message
-        run: |
-          echo "Error creating PR: ${{ steps.cpr.outputs.error-message }}"
+        run: "echo 'Error creating PR: ${{ steps.cpr.outputs.error-message }}'"
