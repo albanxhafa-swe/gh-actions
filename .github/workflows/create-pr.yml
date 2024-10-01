@@ -29,8 +29,7 @@ jobs:
 
       - name: Get latest commit message
         id: get-commit-message
-        run: |
-          echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+        run: echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         id: cpr

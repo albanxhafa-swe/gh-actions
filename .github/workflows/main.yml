@@ -14,7 +14,9 @@ jobs:
   development:
     needs: lint
     if: github.ref == 'refs/heads/development' && github.event_name == 'push'
-    uses: ./.github/workflows/deploy-development.yml
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: development
 
   create-staging-pr:
     needs: development
@@ -28,7 +30,9 @@ jobs:
 
   staging:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
-    uses: ./.github/workflows/deploy-staging.yml
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: staging
 
   create-main-pr:
     needs: staging
@@ -42,4 +46,6 @@ jobs:
 
   main:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
-    uses: ./.github/workflows/deploy-main.yml
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
