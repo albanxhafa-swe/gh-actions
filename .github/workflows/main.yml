@@ -52,4 +52,4 @@ jobs:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     uses: ./.github/workflows/deploy.yml
     with:
-      environment: production
+      environment: main
