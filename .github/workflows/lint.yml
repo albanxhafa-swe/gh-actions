@@ -1,0 +1,49 @@
+name: Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc" # This will use the Node.js version specified in your .nvmrc file
+
+      - name: Debug info
+        run: |
+          echo "Node version:"
+          node --version
+          echo "NPM version:"
+          npm --version
+          echo "Package.json content:"
+          cat package.json
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+
+      - name: Install dependencies
+        run: |
+          npm ci
+        env:
+          CI: true
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Upload npm logs if failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: npm-logs
+          path: ~/.npm/_logs

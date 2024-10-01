@@ -1,0 +1,63 @@
+name: Create Pull Request
+
+on:
+  workflow_call:
+    inputs:
+      base:
+        required: true
+        type: string
+      head:
+        required: true
+        type: string
+      title:
+        required: false
+        type: string
+        default: "Merge {head} into {base}"
+      body:
+        required: false
+        type: string
+        default: "This PR was automatically created to merge changes from {head} into {base}."
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest commit message
+        id: get-commit-message
+        run: |
+          echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ inputs.head }}
+          base: ${{ inputs.base }}
+          title: ${{ format(inputs.title, inputs.head, inputs.base) }}
+          body: |
+            ${{ format(inputs.body, inputs.head, inputs.base) }}
+
+            Latest commit: ${{ steps.get-commit-message.outputs.message }}
+
+            Please review and merge if appropriate.
+          labels: |
+            automated pr
+            ready for review
+          draft: false
+
+      - name: Check outputs
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
+
+      - name: Print error
+        if: failure() && steps.cpr.outputs.error-message
+        run: |
+          echo "Error creating PR: ${{ steps.cpr.outputs.error-message }}"
