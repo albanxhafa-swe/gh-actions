@@ -38,7 +38,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           branch: staging-promotion
-          base: staging
+          base: development
           title: "Promote development to staging"
           body: "This PR updates staging with the latest changes from development."
           labels: automated-pr
@@ -65,7 +65,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           branch: main-promotion
-          base: main
+          base: staging
           title: "Promote staging to main"
           body: "This PR updates main with the latest changes from staging."
           labels: automated-pr
