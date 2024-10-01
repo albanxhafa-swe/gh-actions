@@ -1,0 +1,27 @@
+name: Create Pull Request
+
+on:
+  workflow_call:
+    inputs:
+      base:
+        required: true
+        type: string
+      head:
+        required: true
+        type: string
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ inputs.head }}
+          base: ${{ inputs.base }}
+          title: Merge ${{ inputs.head }} into ${{ inputs.base }}
+          body: |
+            This PR was automatically created to merge changes from ${{ inputs.head }} into ${{ inputs.base }}.
+            Please review and merge if appropriate.
