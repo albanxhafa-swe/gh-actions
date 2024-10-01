@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [development, staging]
+    branches: [development, staging, main]
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches: [development, staging, main]
@@ -17,61 +17,39 @@ jobs:
 
   development:
     needs: lint
-    if: github.ref == 'refs/heads/development' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/development'
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
 
-  staging-promotion:
+  create-staging-pr:
     needs: development
     if: github.ref == 'refs/heads/development' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: staging
-      - name: Reset promotion branch
-        run: |
-          git fetch origin development:development
-          git reset --hard development
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: staging-promotion
-          base: staging
-          title: "Promote development to staging"
-          body: "This PR updates staging with the latest changes from development."
-          labels: automated-pr
+    uses: ./.github/workflows/create-pr.yml
+    with:
+      base: "staging"
+      head: "development"
+      title: "Promote development to staging"
+      body: "This PR updates staging with the latest changes from development."
 
   staging:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
+    if: github.ref == 'refs/heads/staging'
     uses: ./.github/workflows/deploy.yml
     with:
       environment: staging
 
-  main-promotion:
+  create-main-pr:
     needs: staging
     if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - name: Reset promotion branch
-        run: |
-          git fetch origin staging:staging
-          git reset --hard staging
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          branch: main-promotion
-          base: main
-          title: "Promote staging to main"
-          body: "This PR updates main with the latest changes from staging."
-          labels: automated-pr
+    uses: ./.github/workflows/create-pr.yml
+    with:
+      base: "main"
+      head: "staging"
+      title: "Promote staging to main"
+      body: "This PR updates main with the latest changes from staging."
 
   main:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/deploy.yml
     with:
       environment: main
