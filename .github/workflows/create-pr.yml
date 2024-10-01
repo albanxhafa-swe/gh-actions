@@ -36,6 +36,14 @@ jobs:
           MESSAGE="${MESSAGE//$'\r'/'%0D'}"
           echo "message=$MESSAGE" >> $GITHUB_OUTPUT
 
+      - name: Debug information
+        run: |
+          echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
+          echo "Remote branches:"
+          git branch -r
+          echo "Local branches:"
+          git branch -l
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5
@@ -62,5 +70,10 @@ jobs:
           echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"
 
       - name: Print error
-        if: failure() && steps.cpr.outputs.error-message
-        run: "echo 'Error creating PR: ${{ steps.cpr.outputs.error-message }}'"
+        if: failure()
+        run: |
+          echo "Error creating PR: ${{ steps.cpr.outputs.error-message }}"
+          echo "Git status:"
+          git status
+          echo "Git remote:"
+          git remote -v
