@@ -23,6 +23,8 @@ jobs:
     with:
       base: staging
       head: development
+      title: "Merge development into staging"
+      body: "This PR contains the latest changes from development ready for staging."
 
   staging:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'staging'
@@ -35,6 +37,8 @@ jobs:
     with:
       base: main
       head: staging
+      title: "Merge staging into main"
+      body: "This PR contains the latest changes from staging ready for main."
 
   main:
     if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
